@@ -28,7 +28,7 @@ public class Dart : MonoBehaviour
         Board board;
         if(collision.gameObject.TryGetComponent<Board>(out board))
         {
-            board.GetPoints();
+            board.GetPoints(transform.position);
         }
     }
 }
