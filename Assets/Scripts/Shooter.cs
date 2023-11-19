@@ -9,9 +9,7 @@ public class Shooter : MonoBehaviour
     [SerializeField] float _throwStrength;
     [SerializeField] float _throwAngle;
 
-    //Test Code. It throws a new dart every half second.
-
-
+    //When I press once the Screen, I Throw a Dart
     private void Update()
     {
         for (int i = 0; i < Input.touchCount; ++i)
@@ -22,7 +20,6 @@ public class Shooter : MonoBehaviour
             }
         }
     }
-
 
     void ThrowDart()
     {

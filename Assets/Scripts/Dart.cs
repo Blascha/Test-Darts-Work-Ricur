@@ -24,5 +24,11 @@ public class Dart : MonoBehaviour
         StopAllCoroutines();
         _rig = GetComponent<Rigidbody>();
         _rig.constraints = RigidbodyConstraints.FreezeAll;
+
+        Board board;
+        if(collision.gameObject.TryGetComponent<Board>(out board))
+        {
+            board.GetPoints();
+        }
     }
 }
