@@ -5,6 +5,7 @@ using UnityEngine;
 public static class Points
 {
     static int points;
+    public static ScoreBoard Score;
 
     public static void AddPoints(int pointsToAdd)
     {
@@ -14,6 +15,7 @@ public static class Points
 
     static void DisplayPoints()
     {
+        Score.ShowPoints(points);
         Debug.Log(points);
     }
 }
