@@ -7,42 +7,45 @@ public abstract class Board : MonoBehaviour
 {
     [SerializeField] float[] _distancesForPoints;
     [SerializeField] int[] _pointsToGet;
+
     private void Start()
     {
+        DrawBorders();
+
         //I check so that at every distance selected, you will recieva a desired amount of points
-        if(_distancesForPoints.Length != _pointsToGet.Length)
+        if (_distancesForPoints.Length != _pointsToGet.Length)
         {
             Debug.LogError("You should check the distances from the center and the points you will recieve in the dartboard");
             return;
         }
 
-        bool reCheck = false;
+        //bool recheck = false;
 
-        do
-        {
-            //I check so that the distance board is ordered
-            for (int i = 0; i < _distancesForPoints.Length; i++)
-            {
-                if (_distancesForPoints[i] > _distancesForPoints[i + 1])
-                {
-                    //I save the large distance
-                    float biggerDistance = _distancesForPoints[i];
-                    int biggerPoints = _pointsToGet[i];
+        //do
+        //{
+        //    //I check so that the distance board is ordered
+        //    for (int i = 0; i < _distancesForPoints.Length - 1; i++)
+        //    {
+        //        if (_distancesForPoints[i] > _distancesForPoints[i + 1])
+        //        {
+        //            //i save the large distance
+        //            float biggerdistance = _distancesForPoints[i];
+        //            int biggerpoints = _pointsToGet[i];
 
-                    //In it´s place, I place the ones that where smaller
-                    _distancesForPoints[i] = _distancesForPoints[i + 1];
-                    _pointsToGet[i] = _pointsToGet[i + 1];
+        //            //in it´s place, i place the ones that where smaller
+        //            _distancesForPoints[i] = _distancesForPoints[i + 1];
+        //            _pointsToGet[i] = _pointsToGet[i + 1];
 
-                    //Where there was the smaller, I place the big ones
-                    _distancesForPoints[i + 1] = biggerDistance;
-                    _pointsToGet[i + 1] = biggerPoints;
+        //            //where there was the smaller, i place the big ones
+        //            _distancesForPoints[i + 1] = biggerdistance;
+        //            _pointsToGet[i + 1] = biggerpoints;
 
-                    //Im going to reCheck it afterwards, just in case
-                    reCheck = true;
-                }
-            }
-        }
-        while (!reCheck);
+        //            //im going to recheck it afterwards, just in case
+        //            recheck = true;
+        //        }
+        //    }
+        //}
+        //while (!recheck);
     }
 
     public void GetPoints(Vector3 dartPos)
@@ -54,10 +57,11 @@ public abstract class Board : MonoBehaviour
         {
             if (Vector3.Distance(transform.position, dartPos) <= _distancesForPoints[i])
             {
+                Debug.Log(Vector3.Distance(transform.position, dartPos) + " : " + _distancesForPoints[i]);
                 pointsToAdd = _pointsToGet[i];
+                break;
             }
         }
-
 
         AddPoints(pointsToAdd);
     }
@@ -65,6 +69,18 @@ public abstract class Board : MonoBehaviour
     public void AddPoints(int pointsToAdd)
     {
         Points.AddPoints(pointsToAdd);
+    }
+
+    //This function will mke it so that the board displays the correct borders
+    void DrawBorders()
+    {
+        //I get the Mesh renderer and the material
+        MeshRenderer mesh = GetComponent<MeshRenderer>();
+        Material mat = mesh.material;
+
+        //I set the new distances
+        mat.SetFloat("_Distance2", _distancesForPoints[0]);
+        mat.SetFloat("_Distance3", _distancesForPoints[1]);
     }
 
     //This will help visualize the diferent zones where you will recieve points

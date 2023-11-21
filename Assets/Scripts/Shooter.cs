@@ -24,10 +24,10 @@ public class Shooter : MonoBehaviour
     void ThrowDart()
     {
         //I Instantiate the dart prefab and save a reference to it.
-        GameObject dart = Instantiate(_dart , transform);
+        GameObject dart = Instantiate(_dart);
 
         //I make the new instance be in the place where it should be, looking towards where it should look.
-        dart.transform.position = Vector3.zero;
+        dart.transform.position = transform.position;
         Quaternion rotation = Quaternion.Euler(_throwAngle, 0, 0);
         dart.transform.rotation = rotation;
 
