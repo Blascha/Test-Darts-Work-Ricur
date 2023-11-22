@@ -5,12 +5,26 @@ using UnityEngine;
 //I make it abstract so that if I want to make new types of boards, its really easy
 public abstract class Board : MonoBehaviour
 {
+    [Header("Points")]
     [SerializeField] float[] _distancesForPoints;
     [SerializeField] int[] _pointsToGet;
+
+    [Header("Distance Variation")]
+    [SerializeField] AnimationCurve _dificultySpike;
+    [SerializeField] int _maxDistance;
+
+    int _amountOfShotsTaken = 0;
+
+    [SerializeField] bool _switchingPlace;
 
     private void Start()
     {
         DrawBorders();
+
+        //All of the Following are warnings for Debuggin. I wanted to make them automized, but it made everything go slowly
+
+        //This will make it run only when in the Editor. It wont run during build time.
+        #if UNITY_EDITOR
 
         //I check so that at every distance selected, you will recieva a desired amount of points
         if (_distancesForPoints.Length != _pointsToGet.Length)
@@ -19,51 +33,57 @@ public abstract class Board : MonoBehaviour
             return;
         }
 
-        //bool recheck = false;
+        //If Distances are ordered wrongly, I send a Warning
+        for(int i = 0 ; i < _distancesForPoints.Length - 1; i++)
+        {
+            if(_distancesForPoints[i] > _distancesForPoints[i + 1])
+            {
+                Debug.LogError("Board Distances are ordered Poorly. They should go from LOWEST TO HIGHEST");
+            }
+        }
 
-        //do
-        //{
-        //    //I check so that the distance board is ordered
-        //    for (int i = 0; i < _distancesForPoints.Length - 1; i++)
-        //    {
-        //        if (_distancesForPoints[i] > _distancesForPoints[i + 1])
-        //        {
-        //            //i save the large distance
-        //            float biggerdistance = _distancesForPoints[i];
-        //            int biggerpoints = _pointsToGet[i];
+        //If Points are ordered weirdly, I send a Warning
+        for (int i = 0; i < _pointsToGet.Length - 1; i++)
+        {
+            if (_pointsToGet[i] < _pointsToGet[i + 1])
+            {
+                Debug.Log("<color=red> Board Points are Weirdly Ordered. They should go from HIGHEST TO LOWEST</color>");
+            }
+        }
 
-        //            //in it´s place, i place the ones that where smaller
-        //            _distancesForPoints[i] = _distancesForPoints[i + 1];
-        //            _pointsToGet[i] = _pointsToGet[i + 1];
-
-        //            //where there was the smaller, i place the big ones
-        //            _distancesForPoints[i + 1] = biggerdistance;
-        //            _pointsToGet[i + 1] = biggerpoints;
-
-        //            //im going to recheck it afterwards, just in case
-        //            recheck = true;
-        //        }
-        //    }
-        //}
-        //while (!recheck);
+        //If Distances are diferent to Points, I send a Warning
+        if (_pointsToGet.Length != _distancesForPoints.Length)
+        {
+            Debug.LogError("Board Distances and Points should be equally ordered");
+        }
+        #endif
     }
 
     public void GetPoints(Vector3 dartPos)
     {
         int pointsToAdd = 0;
 
-        //Basing myself int the Distance to the dart, I add diferent amounts of points
+        //I check how many points I should add, basing myself on the distance to the center
         for (int i = 0; i < _distancesForPoints.Length; i++)
         {
             if (Vector3.Distance(transform.position, dartPos) <= _distancesForPoints[i])
             {
                 Debug.Log(Vector3.Distance(transform.position, dartPos) + " : " + _distancesForPoints[i]);
                 pointsToAdd = _pointsToGet[i];
+                _amountOfShotsTaken++;
                 break;
             }
         }
 
+        //I actually add the points
         AddPoints(pointsToAdd);
+
+        //Finally, I move the board around
+        if (_switchingPlace)
+        {
+            Move();
+        }
+
     }
 
     public void AddPoints(int pointsToAdd)
@@ -94,5 +114,31 @@ public abstract class Board : MonoBehaviour
         {
             Gizmos.DrawWireSphere(transform.position + transform.up * (-1), _distancesForPoints[i]);
         }
+    }
+
+    private void Move()
+    {
+        //I will get a random direction
+        Vector3 randomDir = GetRandomDir();
+
+        //Then, I will get the distance from the player. This distance will increase, making the game harder every shot.
+        float distance = _dificultySpike.Evaluate(_amountOfShotsTaken/Shooter.MaxShots) * _maxDistance;
+        transform.position = Shooter.Instance.transform.position + randomDir.normalized * distance;
+
+        //Finally, I will make it look towards the Player. If not, scoring would be a hassle
+        transform.LookAt(Shooter.Instance.transform.position);
+    }
+
+    //I will Generate a Random Position, and I try to make it so that its not really vertical. That would be quite anoying.
+    Vector3 GetRandomDir()
+    {
+        float x = Random.Range(-10, 10);
+        float z = Random.Range(-10, 10);
+
+        float yRange = Mathf.Min(Mathf.Repeat(x , 5), Mathf.Repeat(z , 5));
+
+        float y = Random.Range(-yRange , yRange);
+
+        return new Vector3(x , y , z);
     }
 }

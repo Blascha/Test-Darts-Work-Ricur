@@ -7,8 +7,8 @@ using TMPro;
 public class ScoreBoard : MonoBehaviour
 {
     TMP_Text _text;
-    [SerializeField] AnimationCurve GrowthAndShrinkage;
-    [SerializeField] float waitBetweenGrowSteps;
+    [SerializeField] AnimationCurve _growthAndShrinkage;
+    [SerializeField] float _waitBetweenGrowSteps;
 
 
     void Awake()
@@ -34,7 +34,7 @@ public class ScoreBoard : MonoBehaviour
 
         while(i < .5f)
         {
-            transform.localScale = Vector3.one * GrowthAndShrinkage.Evaluate(i);
+            transform.localScale = Vector3.one * _growthAndShrinkage.Evaluate(i);
             i += 0.01f;
             yield return wait;
         }

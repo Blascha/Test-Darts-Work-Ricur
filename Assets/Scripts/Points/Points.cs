@@ -4,18 +4,18 @@ using UnityEngine;
 
 public static class Points
 {
-    static int points;
+    static int _points;
     public static ScoreBoard Score;
 
     public static void AddPoints(int pointsToAdd)
     {
-        points += pointsToAdd;
+        _points += pointsToAdd;
         DisplayPoints();
     }
 
     static void DisplayPoints()
     {
-        Score.ShowPoints(points);
-        Debug.Log(points);
+        Score.ShowPoints(_points);
+        Debug.Log(_points);
     }
 }

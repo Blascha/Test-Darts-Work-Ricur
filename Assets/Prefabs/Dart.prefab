@@ -49,6 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _timeToLive: 20
+  _trail: {fileID: 3504846455020296666}
 --- !u!65 &678933391212254505
 BoxCollider:
   m_ObjectHideFlags: 0

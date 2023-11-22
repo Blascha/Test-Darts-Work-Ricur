@@ -8,6 +8,7 @@ public class Dart : MonoBehaviour
 {
     Rigidbody _rig;
     [SerializeField] float _timeToLive;
+    [SerializeField] TrailRenderer _trail;
 
     //I Destroy the Object after certain time. If it didn´t crash with anything, it probably is too far to see
     IEnumerator Start()
@@ -25,14 +26,15 @@ public class Dart : MonoBehaviour
         //It makes it "Stick" to the place where it hit.
         _rig.constraints = RigidbodyConstraints.FreezeAll;
 
-        //If it hit in a Board, it will get the amount of points it deserve
+        //If it hit in a Board, it will get the amount of points it deserve and stick into it
         Board board;
         if(collision.gameObject.TryGetComponent<Board>(out board))
         {
-            board.GetPoints(transform.position);
-
             //It will make itself a child of the board, to stay in the same relative position forever
             transform.parent = board.transform;
+            _trail.enabled = false;
+
+            board.GetPoints(transform.position);
         }
 
         //It will turn off it´s collider, so that it stops colliding with other things (ex: other Darts)
