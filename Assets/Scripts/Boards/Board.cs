@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //I make it abstract so that if I want to make new types of boards, its really easy
-public abstract class Board : MonoBehaviour
+public abstract class Board : MonoBehaviour , IScreenObject
 {
     [Header("Points")]
     [SerializeField] float[] _distancesForPoints;
@@ -12,13 +12,35 @@ public abstract class Board : MonoBehaviour
     [Header("Distance Variation")]
     [SerializeField] AnimationCurve _dificultySpike;
     [SerializeField] int _maxDistance;
+    [SerializeField] int _minDistance;
 
     int _amountOfShotsTaken = 0;
 
     [SerializeField] bool _switchingPlace;
 
+    public List<GameObject> Darts = new List<GameObject>();
+
+    public void OnScreenStart()
+    {
+        Darts = new List<GameObject>();
+        transform.position = Vector3.forward * _minDistance;
+        gameObject.SetActive(true);
+    }
+
+    public void OnScreenEnd()
+    {
+        //This will make it so that the board isn´t slowly filling with darts from old playthroughs
+        foreach(GameObject i in Darts)
+        {
+            Destroy(i);
+        }
+
+        gameObject.SetActive(false);
+    }
+
     private void Start()
     {
+        ScreenManager.AddObjectToScreen(this, ScreenManager.Screen.Play);
         DrawBorders();
 
         //All of the Following are warnings for Debuggin. I wanted to make them automized, but it made everything go slowly
@@ -59,6 +81,11 @@ public abstract class Board : MonoBehaviour
         #endif
     }
 
+    private void OnEnable()
+    {
+        Debug.Log("Enabled");
+    }
+
     public void GetPoints(Vector3 dartPos)
     {
         int pointsToAdd = 0;
@@ -68,7 +95,6 @@ public abstract class Board : MonoBehaviour
         {
             if (Vector3.Distance(transform.position, dartPos) <= _distancesForPoints[i])
             {
-                Debug.Log(Vector3.Distance(transform.position, dartPos) + " : " + _distancesForPoints[i]);
                 pointsToAdd = _pointsToGet[i];
                 _amountOfShotsTaken++;
                 break;
@@ -79,7 +105,7 @@ public abstract class Board : MonoBehaviour
         AddPoints(pointsToAdd);
 
         //Finally, I move the board around
-        if (_switchingPlace)
+        if (Shooter.Instance.ShotsMade != Shooter.MaxShots && _switchingPlace)
         {
             Move();
         }
@@ -122,11 +148,11 @@ public abstract class Board : MonoBehaviour
         Vector3 randomDir = GetRandomDir();
 
         //Then, I will get the distance from the player. This distance will increase, making the game harder every shot.
-        float distance = _dificultySpike.Evaluate(_amountOfShotsTaken/Shooter.MaxShots) * _maxDistance;
+        float distance = _dificultySpike.Evaluate(_amountOfShotsTaken / Shooter.MaxShots) * (_maxDistance - _minDistance) + _minDistance;
         transform.position = Shooter.Instance.transform.position + randomDir.normalized * distance;
 
         //Finally, I will make it look towards the Player. If not, scoring would be a hassle
-        transform.LookAt(Shooter.Instance.transform.position);
+        transform.up = transform.position - Shooter.Instance.transform.position;
     }
 
     //I will Generate a Random Position, and I try to make it so that its not really vertical. That would be quite anoying.

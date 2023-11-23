@@ -25,6 +25,16 @@ public class ScoreBoard : MonoBehaviour
         _text.text = $"{ pointsAmount} Points";
     }
 
+    public void ShowPoints(int pointsAmount, bool growAndShrink)
+    {
+        if (growAndShrink)
+        {
+            StartCoroutine(GrowAndShrink());
+        }
+
+        _text.text = $"{ pointsAmount} Points";
+    }
+
     IEnumerator GrowAndShrink()
     {
         float i = 0;

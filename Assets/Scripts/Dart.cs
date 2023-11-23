@@ -13,7 +13,10 @@ public class Dart : MonoBehaviour
     //I Destroy the Object after certain time. If it didn´t crash with anything, it probably is too far to see
     IEnumerator Start()
     {
+        //I will first get a reference to its Rigidbody
         _rig = GetComponent<Rigidbody>();
+
+        //I will wait for some time. Eventually, when I said so, it will Destroy itself. This way, Darts that are quite far away will be clansed from the memory. Maybe I could be using Pools and whatnot to make it more efficient, but this will do for now.
         yield return new WaitForSeconds(_timeToLive);
         Destroy(gameObject);
     }
@@ -23,17 +26,21 @@ public class Dart : MonoBehaviour
         // It stops the object form destroying itself.
         StopAllCoroutines();
 
-        //It makes it "Stick" to the place where it hit.
-        _rig.constraints = RigidbodyConstraints.FreezeAll;
-
         //If it hit in a Board, it will get the amount of points it deserve and stick into it
         Board board;
         if(collision.gameObject.TryGetComponent<Board>(out board))
         {
+            //It makes it "Stick" to the place where it hit.
+            _rig.constraints = RigidbodyConstraints.FreezeAll;
+
             //It will make itself a child of the board, to stay in the same relative position forever
             transform.parent = board.transform;
             _trail.enabled = false;
 
+            //This will lead to it´s eventual destruction, but in order to save memory, everything is fair
+            board.Darts.Add(gameObject);
+
+            //I will finally recieve the points that I rigthfully deserve
             board.GetPoints(transform.position);
         }
 
@@ -41,9 +48,10 @@ public class Dart : MonoBehaviour
         GetComponent<BoxCollider>().enabled = false;
     }
     
-    //With this code, the Dart will point towards where its moving
+    
     private void Update()
     {
+        //The Dart will point towards where its moving
         transform.forward = Vector3.Lerp(transform.forward , _rig.velocity.normalized, 0.1f);
     }
 }
