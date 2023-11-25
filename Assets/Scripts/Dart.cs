@@ -6,7 +6,7 @@ using UnityEngine;
 [RequireComponent (typeof(BoxCollider))]
 public class Dart : MonoBehaviour
 {
-    Rigidbody _rig;
+    public Rigidbody Rig;
     [SerializeField] float _timeToLive;
     [SerializeField] TrailRenderer _trail;
 
@@ -14,10 +14,16 @@ public class Dart : MonoBehaviour
     IEnumerator Start()
     {
         //I will first get a reference to its Rigidbody
-        _rig = GetComponent<Rigidbody>();
+        Rig = GetComponent<Rigidbody>();
+        
+        //I will make it be afected by the wind
+        Wind.Darts.Add(this);
 
         //I will wait for some time. Eventually, when I said so, it will Destroy itself. This way, Darts that are quite far away will be clansed from the memory. Maybe I could be using Pools and whatnot to make it more efficient, but this will do for now.
         yield return new WaitForSeconds(_timeToLive);
+
+        //I will make the wind stop trying to add a force to me
+        Wind.Darts.Remove(this);
         Destroy(gameObject);
     }
 
@@ -31,7 +37,7 @@ public class Dart : MonoBehaviour
         if(collision.gameObject.TryGetComponent<Board>(out board))
         {
             //It makes it "Stick" to the place where it hit.
-            _rig.constraints = RigidbodyConstraints.FreezeAll;
+            Rig.constraints = RigidbodyConstraints.FreezeAll;
 
             //It will make itself a child of the board, to stay in the same relative position forever
             transform.parent = board.transform;
@@ -52,6 +58,6 @@ public class Dart : MonoBehaviour
     private void Update()
     {
         //The Dart will point towards where its moving
-        transform.forward = Vector3.Lerp(transform.forward , _rig.velocity.normalized, 0.1f);
+        transform.forward = Vector3.Lerp(transform.forward , Rig.velocity.normalized, 0.1f);
     }
 }

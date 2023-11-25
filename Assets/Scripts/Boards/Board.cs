@@ -122,6 +122,7 @@ public abstract class Board : MonoBehaviour , IScreenObject
         //Finally, I move the board around
         if (Shooter.Instance.ShotsMade != Shooter.MaxShots && _switchingPlace)
         {
+            StopAllCoroutines();
             StartCoroutine("Disapear");
         }
 
@@ -187,28 +188,44 @@ public abstract class Board : MonoBehaviour , IScreenObject
 
     IEnumerator Disapear()
     {
+        //I will turn off the collider. So that darts hitting me wont break everything
+        Collider collider = GetComponent<Collider>();
+        collider.enabled = false;
+
+        //I will change my scale, basing it on the curves you can change in the editor and the total amount of time
         WaitForSeconds wait = new WaitForSeconds(0.01f);
         Vector3 normalScale = transform.localScale;
 
         for (float i = 0; i <= _disapearTime; i += 0.01f)
         {
-            transform.localScale = normalScale * _disappearCurve.Evaluate(i);
+            transform.localScale = normalScale * _disappearCurve.Evaluate(i * _disapearTime);
             yield return wait;
         }
 
+        //I will change the position of the object
         Move();
 
-        StartCoroutine(Appear(normalScale));
+        //I will start the appearing animation
+        StartCoroutine(Appear(normalScale , collider));
     }
 
-    IEnumerator Appear(Vector3 normalScale)
+    IEnumerator Appear(Vector3 normalScale , Collider collider)
     {
+        //I will make the same as before, but with another curve
         WaitForSeconds wait = new WaitForSeconds(0.01f);
 
         for (float i = 0; i <= _disapearTime; i += 0.01f)
         {
-            transform.localScale = normalScale * _appearCurve.Evaluate(i);
+            transform.localScale = normalScale * _appearCurve.Evaluate(i * _disapearTime);
             yield return wait;
+
+            if (i == .5f)
+            {
+                //I will enable the collider when it´s in the middle of the animation
+                collider.enabled = true;
+            }
         }
+
+        
     }
 }
