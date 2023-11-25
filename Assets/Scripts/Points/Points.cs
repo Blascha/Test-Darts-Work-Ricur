@@ -17,6 +17,7 @@ public static class Points
         if(_points > HighScore)
         {
             HighScore = _points;
+            Debug.Log(HighScore);
         }
 
         //Finally, it will display them

@@ -18,18 +18,30 @@ public abstract class Board : MonoBehaviour , IScreenObject
 
     [SerializeField] bool _switchingPlace;
 
+    [Header ("Disappear and Dissapear")]
+    [SerializeField] AnimationCurve _disappearCurve;
+    [SerializeField] AnimationCurve _appearCurve;
+    [SerializeField] float _disapearTime;
+
     public List<GameObject> Darts = new List<GameObject>();
 
     public void OnScreenStart()
     {
         Darts = new List<GameObject>();
+
+        //I move the Board to where it should be and watch towards the player, then I turn it on
         transform.position = Vector3.forward * _minDistance;
+        transform.up = transform.position - Shooter.Instance.transform.position;
+        
+        _amountOfShotsTaken = 0;
+
+
         gameObject.SetActive(true);
     }
 
     public void OnScreenEnd()
     {
-        //This will make it so that the board isn´t slowly filling with darts from old playthroughs
+        //This will make it so that the board isn´t slowly filling with darts from old playthroughs, then it will turn it on
         foreach(GameObject i in Darts)
         {
             Destroy(i);
@@ -40,6 +52,10 @@ public abstract class Board : MonoBehaviour , IScreenObject
 
     private void Start()
     {
+        //I move the Board to where it should be and watch towards the player, then I turn it on
+        transform.position = Vector3.forward * _minDistance;
+        transform.up = transform.position - Shooter.Instance.transform.position;
+
         ScreenManager.AddObjectToScreen(this, ScreenManager.Screen.Play);
         DrawBorders();
 
@@ -96,7 +112,6 @@ public abstract class Board : MonoBehaviour , IScreenObject
             if (Vector3.Distance(transform.position, dartPos) <= _distancesForPoints[i])
             {
                 pointsToAdd = _pointsToGet[i];
-                _amountOfShotsTaken++;
                 break;
             }
         }
@@ -107,7 +122,7 @@ public abstract class Board : MonoBehaviour , IScreenObject
         //Finally, I move the board around
         if (Shooter.Instance.ShotsMade != Shooter.MaxShots && _switchingPlace)
         {
-            Move();
+            StartCoroutine("Disapear");
         }
 
     }
@@ -148,11 +163,13 @@ public abstract class Board : MonoBehaviour , IScreenObject
         Vector3 randomDir = GetRandomDir();
 
         //Then, I will get the distance from the player. This distance will increase, making the game harder every shot.
-        float distance = _dificultySpike.Evaluate(_amountOfShotsTaken / Shooter.MaxShots) * (_maxDistance - _minDistance) + _minDistance;
+        float distance = _dificultySpike.Evaluate((float)(Shooter.Instance.ShotsMade) / Shooter.MaxShots) * (_maxDistance - _minDistance) + _minDistance;
         transform.position = Shooter.Instance.transform.position + randomDir.normalized * distance;
 
         //Finally, I will make it look towards the Player. If not, scoring would be a hassle
         transform.up = transform.position - Shooter.Instance.transform.position;
+
+        Debug.Log($"<color=black>Distance to center {transform.position.magnitude}</color>");
     }
 
     //I will Generate a Random Position, and I try to make it so that its not really vertical. That would be quite anoying.
@@ -166,5 +183,32 @@ public abstract class Board : MonoBehaviour , IScreenObject
         float y = Random.Range(-yRange , yRange);
 
         return new Vector3(x , y , z);
+    }
+
+    IEnumerator Disapear()
+    {
+        WaitForSeconds wait = new WaitForSeconds(0.01f);
+        Vector3 normalScale = transform.localScale;
+
+        for (float i = 0; i <= _disapearTime; i += 0.01f)
+        {
+            transform.localScale = normalScale * _disappearCurve.Evaluate(i);
+            yield return wait;
+        }
+
+        Move();
+
+        StartCoroutine(Appear(normalScale));
+    }
+
+    IEnumerator Appear(Vector3 normalScale)
+    {
+        WaitForSeconds wait = new WaitForSeconds(0.01f);
+
+        for (float i = 0; i <= _disapearTime; i += 0.01f)
+        {
+            transform.localScale = normalScale * _appearCurve.Evaluate(i);
+            yield return wait;
+        }
     }
 }

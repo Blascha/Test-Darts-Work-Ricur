@@ -40,6 +40,7 @@ public static class SaveManager
     {
         Debug.Log("<color=cyan> Saving </color>");
 
+        data.HighScore = Points.HighScore;
 
         string json = JsonUtility.ToJson(data);
         Debug.Log($"<color=cyan>Saving: {json}</color>");

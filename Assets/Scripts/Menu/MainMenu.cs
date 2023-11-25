@@ -22,6 +22,11 @@ public class MainMenu : MonoBehaviour , IScreenObject
         {
             ButtonToTurnOn.enabled = false;
         }
+
+        if (HighScore != null)
+        {
+            HighScore.text = $"High Score: <color=yellow>{Points.HighScore}</color>";
+        }
     }
 
     //Most of these functions are mostly stuff like pressing play, wich only makes the screen manager shift to the game screen
