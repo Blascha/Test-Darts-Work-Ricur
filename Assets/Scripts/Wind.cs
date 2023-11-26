@@ -7,6 +7,7 @@ public class Wind : MonoBehaviour, IScreenObject
     public static List<Dart> Darts;
     public static Vector3 windStrength;
     [SerializeField] float windMagnitude;
+    [SerializeField] Transform windArrow;
 
     void Awake()
     {
@@ -28,7 +29,9 @@ public class Wind : MonoBehaviour, IScreenObject
     //I will add the force from the wind constantly
     void FixedUpdate()
     {
-        foreach(Dart i in Darts)
+        windArrow.up = windStrength;
+
+        foreach (Dart i in Darts)
         {
             i.Rig.AddForce(windStrength);
         }
@@ -45,6 +48,6 @@ public class Wind : MonoBehaviour, IScreenObject
 
     void OnDrawGizmosSelected()
     {
-        Gizmos.DrawLine(Vector3.zero, windStrength);
+        Gizmos.DrawLine(transform.position, windStrength);
     }
 }

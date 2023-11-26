@@ -48,8 +48,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b569d548ed19de48b91fcdc4a5ef80d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Rig: {fileID: 0}
   _timeToLive: 20
   _trail: {fileID: 3504846455020296666}
+  _particles: {fileID: 4143561844633471416, guid: 7d77cf71e748ec6469780a3ad09f1fe0,
+    type: 3}
 --- !u!65 &678933391212254505
 BoxCollider:
   m_ObjectHideFlags: 0

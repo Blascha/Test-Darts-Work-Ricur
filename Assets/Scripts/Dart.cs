@@ -9,6 +9,7 @@ public class Dart : MonoBehaviour
     public Rigidbody Rig;
     [SerializeField] float _timeToLive;
     [SerializeField] TrailRenderer _trail;
+    [SerializeField] ParticleSystem _particles;
 
     //I Destroy the Object after certain time. If it didn´t crash with anything, it probably is too far to see
     IEnumerator Start()
@@ -36,12 +37,19 @@ public class Dart : MonoBehaviour
         Board board;
         if(collision.gameObject.TryGetComponent<Board>(out board))
         {
+            transform.forward = Rig.velocity.normalized;
+
             //It makes it "Stick" to the place where it hit.
             Rig.constraints = RigidbodyConstraints.FreezeAll;
 
             //It will make itself a child of the board, to stay in the same relative position forever
             transform.parent = board.transform;
             _trail.enabled = false;
+
+            //I will instantiate the Particles and make them point towards the Player
+            ParticleSystem particle = Instantiate(_particles);
+            particle.transform.position = transform.position;
+            particle.transform.forward = -transform.forward;
 
             //This will lead to it´s eventual destruction, but in order to save memory, everything is fair
             board.Darts.Add(gameObject);
