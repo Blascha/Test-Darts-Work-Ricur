@@ -2715,7 +2715,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   _maxDistance: 60
   _minDistance: 15
-  _switchingPlace: 1
+  _switchingPlace: 0
   _disappearCurve:
     serializedVersion: 2
     m_Curve:

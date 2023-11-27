@@ -51,6 +51,9 @@ public class Dart : MonoBehaviour
             particle.transform.position = transform.position;
             particle.transform.forward = -transform.forward;
 
+            //I will play the sound
+            GetComponent<AudioSource>().Play();
+
             //This will lead to it´s eventual destruction, but in order to save memory, everything is fair
             board.Darts.Add(gameObject);
 
