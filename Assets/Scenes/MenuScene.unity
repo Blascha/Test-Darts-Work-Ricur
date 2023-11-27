@@ -2687,6 +2687,8 @@ MonoBehaviour:
   - 3.5
   - 5
   _pointsToGet: 0a0000000500000001000000
+  _pointsAnimator: {fileID: 7073178764106617399, guid: 5a360f368b5ba73458eaef3e6ff02d20,
+    type: 3}
   _dificultySpike:
     serializedVersion: 2
     m_Curve:

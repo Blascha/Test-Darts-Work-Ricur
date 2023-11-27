@@ -8,6 +8,7 @@ public abstract class Board : MonoBehaviour , IScreenObject
     [Header("Points")]
     [SerializeField] float[] _distancesForPoints;
     [SerializeField] int[] _pointsToGet;
+    [SerializeField] GameObject _pointsAnimator;
 
     [Header("Distance Variation")]
     [SerializeField] AnimationCurve _dificultySpike;
@@ -22,6 +23,8 @@ public abstract class Board : MonoBehaviour , IScreenObject
     [SerializeField] AnimationCurve _disappearCurve;
     [SerializeField] AnimationCurve _appearCurve;
     [SerializeField] float _disapearTime;
+
+    
 
     public List<GameObject> Darts = new List<GameObject>();
 
@@ -118,6 +121,11 @@ public abstract class Board : MonoBehaviour , IScreenObject
 
         //I actually add the points
         AddPoints(pointsToAdd);
+
+        //I add this to show how many points I recieve
+        GameObject pointsAnimator = Instantiate(_pointsAnimator);
+        pointsAnimator.transform.position = dartPos;
+        pointsAnimator.GetComponent<PointsAnimator>().ShowPoints(pointsToAdd);
 
         //Finally, I move the board around
         if (Shooter.Instance.ShotsMade != Shooter.MaxShots && _switchingPlace)
